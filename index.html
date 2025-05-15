@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Muscle Day - Fitness Tracker</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #f8f0e3, #ffe0b3);
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      max-width: 500px;
+      margin: auto;
+    }
+    h1 {
+      color: #ff7b00;
+    }
+    input, select, button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #ff7b00;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    #result {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Muscle Day</h1>
+    <p>Track your fitness goals effectively</p>
+  </header>
+
+  <div class="container">
+    <button onclick="login()">Login with Google</button>
+    <div id="user-info" style="display:none;">
+      <p>Welcome, <span id="user-name"></span>!</p>
+      <form onsubmit="calculateProgress(event)">
+        <label for="goal">Goal:</label>
+        <select id="goal">
+          <option value="gain">Gain Weight</option>
+          <option value="loss">Lose Weight</option>
+        </select>
+
+        <label for="targetCalories">Daily Calorie Target:</label>
+        <input type="number" id="targetCalories" required>
+
+        <label for="consumedCalories">Calories Consumed Today:</label>
+        <input type="number" id="consumedCalories" required>
+
+        <button type="submit">Calculate Progress</button>
+      </form>
+      <div id="result"></div>
+      <button onclick="sendNotification()">Send Notification to Phone</button>
+    </div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    function login() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider).then(result => {
+        const user = result.user;
+        document.getElementById("user-info").style.display = "block";
+        document.getElementById("user-name").textContent = user.displayName;
+      }).catch(error => alert(error.message));
+    }
+
+    function calculateProgress(e) {
+      e.preventDefault();
+      const goal = document.getElementById("goal").value;
+      const target = parseInt(document.getElementById("targetCalories").value);
+      const consumed = parseInt(document.getElementById("consumedCalories").value);
+      const progress = Math.min((consumed / target) * 100, 100).toFixed(1);
+
+      let msg = `You have achieved ${progress}% of your goal today.`;
+      if (goal === 'gain' && consumed < target) msg += ' Eat a bit more!';
+      if (goal === 'loss' && consumed > target) msg += ' Reduce your intake!';
+
+      document.getElementById("result").textContent = msg;
+    }
+
+    function sendNotification() {
+      if (Notification.permission === "granted") {
+        new Notification("Muscle Day", {
+          body: "Track your progress now!",
+          icon: "https://cdn-icons-png.flaticon.com/512/837/837812.png"
+        });
+      } else if (Notification.permission !== "denied") {
+        Notification.requestPermission().then(permission => {
+          if (permission === "granted") {
+            new Notification("Muscle Day", {
+              body: "Track your progress now!",
+              icon: "https://cdn-icons-png.flaticon.com/512/837/837812.png"
+            });
+          }
+        });
+      } else {
+        alert("Notifications are blocked. Please enable them in your browser settings.");
+      }
+    }
+  </script>
+</body>
+</html>
