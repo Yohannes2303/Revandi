@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Muscle Day - Fitness Tracker</title>
+  <title>Muscle Day - Login & Tracker</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(to right, #f8f0e3, #ffe0b3);
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #fff3e0, #ffe0b2);
       margin: 0;
       padding: 20px;
       color: #333;
@@ -46,11 +46,13 @@
       font-weight: bold;
     }
   </style>
+
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 </head>
 <body>
+
   <header>
     <h1>Muscle Day</h1>
     <p>Track your fitness goals effectively</p>
@@ -81,13 +83,17 @@
   </div>
 
   <script>
+    // 🔧 GANTI INI dengan konfigurasi Firebase asli dari project kamu!
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_AUTH_DOMAIN",
-      projectId: "YOUR_PROJECT_ID",
-      appId: "YOUR_APP_ID"
+      apiKey: "AIzaSyDxxxYOURS-HERE",
+      authDomain: "your-project-id.firebaseapp.com",
+      projectId: "your-project-id",
+      storageBucket: "your-project-id.appspot.com",
+      messagingSenderId: "1234567890",
+      appId: "1:1234567890:web:abc1234567890"
     };
 
+    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
@@ -97,7 +103,9 @@
         const user = result.user;
         document.getElementById("user-info").style.display = "block";
         document.getElementById("user-name").textContent = user.displayName;
-      }).catch(error => alert(error.message));
+      }).catch(error => {
+        alert("Login error: " + error.message);
+      });
     }
 
     function calculateProgress(e) {
