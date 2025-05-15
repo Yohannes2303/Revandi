@@ -46,6 +46,7 @@
       background: #f1f1f1;
       padding: 15px;
       border-radius: 10px;
+      margin-top: 15px;
     }
     .food-entry {
       display: flex;
@@ -68,7 +69,7 @@
       <img src="https://cdn-icons-png.flaticon.com/512/1048/1048941.png" alt="Muscle Day Logo" />
       <h1>Muscle Day</h1>
     </div>
-    <p>"Perjalanan kebugaran pribadi Anda dimulai di sini"</p>
+    <p>"Kesehatan adalah segalanya jagalah kesehatan dan kebugaran anda"</p>
   </header>
 
   <section class="onboarding">
@@ -82,8 +83,15 @@
 
   <section id="home" class="home">
     <h2>Aktivitas Hari Ini</h2>
-    <div class="summary">Langkah: 5.000 | Kalori terbakar: 250</div>
+    <div class="summary">Langkah: 5.000 | Kalori terbakar: 0</div>
     <div class="tips">Tips hari ini: Tetap terhidrasi!</div>
+    <h3>Pilih Aktivitas</h3>
+    <div>
+      <button onclick="addActivity('Jogging', 300)">Jogging</button>
+      <button onclick="addActivity('Renang', 400)">Renang</button>
+      <button onclick="addActivity('Yoga', 150)">Yoga</button>
+    </div>
+    <p id="activityLog"></p>
     <button>Mulai Aktivitas</button>
   </section>
 
@@ -109,7 +117,13 @@
     </ul>
     <h3>Catatan Konsumsi Makanan</h3>
     <form>
-      <input type="text" id="foodItem" placeholder="Contoh: Nasi, Ayam Goreng" />
+      <select id="foodSelect" onchange="autoFillCalories()">
+        <option value="">Pilih makanan</option>
+        <option value="Nasi Goreng|400">Nasi Goreng</option>
+        <option value="Ayam Bakar|300">Ayam Bakar</option>
+        <option value="Salad Buah|150">Salad Buah</option>
+      </select>
+      <input type="text" id="foodItem" placeholder="Nama makanan" />
       <input type="number" id="calories" placeholder="Kalori makanan (mis. 300)" />
       <button type="button" onclick="addFood()">Tambah Makanan</button>
     </form>
@@ -127,7 +141,7 @@
     <input type="number" id="targetCalories" placeholder="Target Kalori Harian (mis: 2200)" />
     <div class="tracker">Pencapaian: <span id="progressText">0%</span></div>
     <div class="graph">
-      <h3>Grafik Progres Kalori</h3>
+      <h3>Grafik Progres Kalori Harian</h3>
       <canvas id="progressChart" width="100%" height="200"></canvas>
     </div>
   </section>
@@ -135,6 +149,23 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     let foods = [];
+    let activityCalories = 0;
+
+    function autoFillCalories() {
+      const selected = document.getElementById('foodSelect').value;
+      if (selected) {
+        const [item, cal] = selected.split('|');
+        document.getElementById('foodItem').value = item;
+        document.getElementById('calories').value = cal;
+      }
+    }
+
+    function addActivity(name, cal) {
+      activityCalories += cal;
+      document.querySelector('.summary').innerText = `Langkah: 5.000 | Kalori terbakar: ${activityCalories}`;
+      document.getElementById('activityLog').innerText += `${name} (${cal} kcal) ditambahkan\n`;
+    }
+
     function addFood() {
       const item = document.getElementById('foodItem').value;
       const cal = parseInt(document.getElementById('calories').value);
@@ -144,6 +175,7 @@
       document.getElementById('calories').value = '';
       updateList();
     }
+
     function updateList() {
       const container = document.getElementById('foodList');
       container.innerHTML = '';
@@ -161,32 +193,54 @@
       document.getElementById('progressText').innerText = `${percent}%`;
       let message = `Total kalori: ${total} kcal — ${percent}% dari target harian Anda.`;
       if (goal === 'gain') {
-        message += total < target ? ' Tambah konsumsi makanan Anda!' : ' Target tercapai!';
+        message += total < target ? ' 💡 Tambah konsumsi makanan Anda!' : ' 🎉 Target tercapai!';
       } else {
-        message += total > target ? ' Perhatikan jumlah kalori Anda!' : ' Anda berada dalam batas aman!';
+        message += total > target ? ' ⚠️ Perhatikan jumlah kalori Anda!' : ' 👍 Anda berada dalam batas aman!';
       }
       document.getElementById('result').textContent = message;
       updateChart(total, target);
     }
+
     function updateChart(consumed, target) {
       const ctx = document.getElementById('progressChart').getContext('2d');
       if (window.progressChart) window.progressChart.destroy();
+
+      let dataColor = '#0077b6';
+      let remainder = Math.max(target - consumed, 0);
+
+      if (consumed > target) {
+        dataColor = '#f94144';
+        remainder = 0;
+      } else if (consumed >= target * 0.9) {
+        dataColor = '#90be6d';
+      }
+
       window.progressChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
           labels: ['Terkonsumsi', 'Sisa'],
           datasets: [{
-            data: [consumed, Math.max(target - consumed, 0)],
-            backgroundColor: ['#0077b6', '#caf0f8'],
+            data: [consumed, target - consumed > 0 ? target - consumed : 0],
+            backgroundColor: [dataColor, '#eeeeee'],
+            borderWidth: 1
           }]
         },
         options: {
           responsive: true,
           cutout: '70%',
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `${context.label}: ${context.parsed} kcal`;
+                }
+              }
+            }
+          }
         }
       });
     }
-    // Grafik Aktivitas
+
     const ctx2 = document.getElementById('exerciseChart').getContext('2d');
     new Chart(ctx2, {
       type: 'bar',
