@@ -1,146 +1,212 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Muscle Day - Login & Tracker</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Muscle Day Web App</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #fff3e0, #ffe0b2);
+      background: linear-gradient(to right, #c9d6ff, #e2e2e2);
       margin: 0;
-      padding: 20px;
+      padding: 0;
       color: #333;
     }
-    header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    .container {
-      background: white;
+    header, section {
       padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      max-width: 500px;
-      margin: auto;
+      margin: 20px;
+      background-color: rgba(255, 255, 255, 0.95);
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
     }
-    h1 {
-      color: #ff7b00;
+    h1, h2, h3 {
+      color: #0077b6;
     }
-    input, select, button {
-      display: block;
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    button {
-      background-color: #ff7b00;
+    .button, button {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #0077b6;
       color: white;
+      text-decoration: none;
       border: none;
+      border-radius: 5px;
+      margin-top: 10px;
+      font-weight: bold;
       cursor: pointer;
     }
-    #result {
-      margin-top: 15px;
-      font-weight: bold;
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      margin-bottom: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    .graph {
+      background: #f1f1f1;
+      padding: 15px;
+      border-radius: 10px;
+    }
+    .food-entry {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo img {
+      height: 60px;
     }
   </style>
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 </head>
 <body>
-
-  <header>
-    <h1>Muscle Day</h1>
-    <p>Track your fitness goals effectively</p>
+  <header class="splash">
+    <div class="logo">
+      <img src="https://cdn-icons-png.flaticon.com/512/1048/1048941.png" alt="Muscle Day Logo" />
+      <h1>Muscle Day</h1>
+    </div>
+    <p>"Perjalanan kebugaran pribadi Anda dimulai di sini"</p>
   </header>
 
-  <div class="container">
-    <button onclick="login()">Login with Google</button>
-    <div id="user-info" style="display:none;">
-      <p>Welcome, <span id="user-name"></span>!</p>
-      <form onsubmit="calculateProgress(event)">
-        <label for="goal">Goal:</label>
-        <select id="goal">
-          <option value="gain">Gain Weight</option>
-          <option value="loss">Lose Weight</option>
-        </select>
+  <section class="onboarding">
+    <h2>Pengenalan</h2>
+    <div class="slide">Fitur 1: Pelacak olahraga harian</div>
+    <div class="slide">Fitur 2: Rencana makan sehat</div>
+    <div class="slide">Fitur 3: Sinkronisasi smartwatch</div>
+    <div class="slide">Fitur 4: Tips & motivasi</div>
+    <a href="#home" class="button">Mulai</a>
+  </section>
 
-        <label for="targetCalories">Daily Calorie Target:</label>
-        <input type="number" id="targetCalories" required>
+  <section id="home" class="home">
+    <h2>Aktivitas Hari Ini</h2>
+    <div class="summary">Langkah: 5.000 | Kalori terbakar: 250</div>
+    <div class="tips">Tips hari ini: Tetap terhidrasi!</div>
+    <button>Mulai Aktivitas</button>
+  </section>
 
-        <label for="consumedCalories">Calories Consumed Today:</label>
-        <input type="number" id="consumedCalories" required>
-
-        <button type="submit">Calculate Progress</button>
-      </form>
-      <div id="result"></div>
-      <button onclick="sendNotification()">Send Notification to Phone</button>
+  <section class="activity">
+    <h2>Statistik Olahraga</h2>
+    <ul>
+      <li>Langkah: 5.000</li>
+      <li>Kalori: 250</li>
+      <li>Waktu: 30 menit</li>
+    </ul>
+    <h3>Riwayat Mingguan</h3>
+    <div class="graph">
+      <canvas id="exerciseChart" height="200"></canvas>
     </div>
-  </div>
+    <button>Mulai Latihan</button>
+  </section>
 
+  <section class="meal-plan">
+    <h2>Menu Hari Ini</h2>
+    <ul>
+      <li>Sarapan: Oatmeal + Buah</li>
+      <li>Makan Siang: Ayam Panggang + Sayur</li>
+    </ul>
+    <h3>Catatan Konsumsi Makanan</h3>
+    <form>
+      <input type="text" id="foodItem" placeholder="Contoh: Nasi, Ayam Goreng" />
+      <input type="number" id="calories" placeholder="Kalori makanan (mis. 300)" />
+      <button type="button" onclick="addFood()">Tambah Makanan</button>
+    </form>
+    <div id="foodList"></div>
+    <div id="result"></div>
+  </section>
+
+  <section class="profile">
+    <h2>Profil Saya</h2>
+    <input type="text" id="name" placeholder="Nama Anda" />
+    <select id="goal">
+      <option value="gain">Menambah Berat Badan</option>
+      <option value="loss">Menurunkan Berat Badan</option>
+    </select>
+    <input type="number" id="targetCalories" placeholder="Target Kalori Harian (mis: 2200)" />
+    <div class="tracker">Pencapaian: <span id="progressText">0%</span></div>
+    <div class="graph">
+      <h3>Grafik Progres Kalori</h3>
+      <canvas id="progressChart" width="100%" height="200"></canvas>
+    </div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    // 🔧 GANTI INI dengan konfigurasi Firebase asli dari project kamu!
-    const firebaseConfig = {
-      apiKey: "AIzaSyDxxxYOURS-HERE",
-      authDomain: "your-project-id.firebaseapp.com",
-      projectId: "your-project-id",
-      storageBucket: "your-project-id.appspot.com",
-      messagingSenderId: "1234567890",
-      appId: "1:1234567890:web:abc1234567890"
-    };
-
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-
-    function login() {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider).then(result => {
-        const user = result.user;
-        document.getElementById("user-info").style.display = "block";
-        document.getElementById("user-name").textContent = user.displayName;
-      }).catch(error => {
-        alert("Login error: " + error.message);
+    let foods = [];
+    function addFood() {
+      const item = document.getElementById('foodItem').value;
+      const cal = parseInt(document.getElementById('calories').value);
+      if (!item || isNaN(cal)) return;
+      foods.push({ item, cal });
+      document.getElementById('foodItem').value = '';
+      document.getElementById('calories').value = '';
+      updateList();
+    }
+    function updateList() {
+      const container = document.getElementById('foodList');
+      container.innerHTML = '';
+      let total = 0;
+      foods.forEach(f => {
+        const div = document.createElement('div');
+        div.className = 'food-entry';
+        div.innerHTML = `<span>${f.item}</span><span>${f.cal} kcal</span>`;
+        container.appendChild(div);
+        total += f.cal;
+      });
+      const target = parseInt(document.getElementById('targetCalories').value) || 0;
+      const goal = document.getElementById('goal').value;
+      const percent = target > 0 ? Math.min((total / target) * 100, 100).toFixed(1) : 0;
+      document.getElementById('progressText').innerText = `${percent}%`;
+      let message = `Total kalori: ${total} kcal — ${percent}% dari target harian Anda.`;
+      if (goal === 'gain') {
+        message += total < target ? ' Tambah konsumsi makanan Anda!' : ' Target tercapai!';
+      } else {
+        message += total > target ? ' Perhatikan jumlah kalori Anda!' : ' Anda berada dalam batas aman!';
+      }
+      document.getElementById('result').textContent = message;
+      updateChart(total, target);
+    }
+    function updateChart(consumed, target) {
+      const ctx = document.getElementById('progressChart').getContext('2d');
+      if (window.progressChart) window.progressChart.destroy();
+      window.progressChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Terkonsumsi', 'Sisa'],
+          datasets: [{
+            data: [consumed, Math.max(target - consumed, 0)],
+            backgroundColor: ['#0077b6', '#caf0f8'],
+          }]
+        },
+        options: {
+          responsive: true,
+          cutout: '70%',
+        }
       });
     }
-
-    function calculateProgress(e) {
-      e.preventDefault();
-      const goal = document.getElementById("goal").value;
-      const target = parseInt(document.getElementById("targetCalories").value);
-      const consumed = parseInt(document.getElementById("consumedCalories").value);
-      const progress = Math.min((consumed / target) * 100, 100).toFixed(1);
-
-      let msg = `You have achieved ${progress}% of your goal today.`;
-      if (goal === 'gain' && consumed < target) msg += ' Eat a bit more!';
-      if (goal === 'loss' && consumed > target) msg += ' Reduce your intake!';
-
-      document.getElementById("result").textContent = msg;
-    }
-
-    function sendNotification() {
-      if (Notification.permission === "granted") {
-        new Notification("Muscle Day", {
-          body: "Track your progress now!",
-          icon: "https://cdn-icons-png.flaticon.com/512/837/837812.png"
-        });
-      } else if (Notification.permission !== "denied") {
-        Notification.requestPermission().then(permission => {
-          if (permission === "granted") {
-            new Notification("Muscle Day", {
-              body: "Track your progress now!",
-              icon: "https://cdn-icons-png.flaticon.com/512/837/837812.png"
-            });
+    // Grafik Aktivitas
+    const ctx2 = document.getElementById('exerciseChart').getContext('2d');
+    new Chart(ctx2, {
+      type: 'bar',
+      data: {
+        labels: ['Jogging', 'Bersepeda', 'Renang', 'Yoga', 'Angkat Beban'],
+        datasets: [{
+          label: 'Kalori Terbakar (kcal)',
+          data: [300, 250, 400, 150, 350],
+          backgroundColor: '#00b4d8'
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true
           }
-        });
-      } else {
-        alert("Notifications are blocked. Please enable them in your browser settings.");
+        }
       }
-    }
+    });
   </script>
 </body>
 </html>
